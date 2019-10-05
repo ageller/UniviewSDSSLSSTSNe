@@ -12,7 +12,6 @@ uniform float radiusScale;
 uniform float SNduration;
 uniform float SNangleMin;
 uniform float SNangleMax;
-uniform bool repeat;
 
 out vec2 texcoord;
 
@@ -67,17 +66,17 @@ void main()
 {
 	
 	//get the time 
-	float dayfract = uv_simulationtimeSeconds/(24.0*3600.0);
-	float eventTime = (uv_simulationtimeDays + dayfract)/365.2425 + 1970.;
+	float Udayfract = uv_simulationtimeSeconds/(24.0*3600.0);
+	float eventTime = (uv_simulationtimeDays + Udayfract);///365.2425 + 1970.;
 
-	float time = gl_in[1].gl_Position.x;
-	//want to allow this to repeat?
-	if (repeat){
-		float tmin = 2023.0;
-		float tmax = 2023.26796;
-		float yrfrac = (time - tmin)/(tmax - tmin);
-		time = floor(eventTime) + yrfrac;
-	}
+	float time = gl_in[1].gl_Position.x; //days
+	// allow this to repeat
+	float tmin = 0.004426;
+	float tmax = 97.86983;
+	// float tmin = 2023.00001;
+	// float tmax = 2023.26796;
+	float Sdayfract = (time - tmin)/(tmax - tmin);
+	time = uv_simulationtimeDays + Sdayfract;
 	
 	vec4 pos = vec4(-gl_in[0].gl_Position.x, -gl_in[0].gl_Position.y, gl_in[0].gl_Position.z, 1.); //these flips in x and y are needed to match stripe 82
 
