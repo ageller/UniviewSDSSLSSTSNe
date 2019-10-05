@@ -1,3 +1,5 @@
+//precision highp float; //this doesn't seem to change anything.
+
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 4) out;
 
@@ -73,10 +75,11 @@ void main()
 	// allow this to repeat
 	float tmin = 0.004426;
 	float tmax = 97.86983;
+	eventTime = mod(eventTime, tmax); 
 	// float tmin = 2023.00001;
 	// float tmax = 2023.26796;
-	float Sdayfract = (time - tmin)/(tmax - tmin);
-	time = uv_simulationtimeDays + Sdayfract;
+	//float Sdayfract = (time - tmin)/(tmax - tmin);
+	//time = uv_simulationtimeDays + Sdayfract;
 	
 	vec4 pos = vec4(-gl_in[0].gl_Position.x, -gl_in[0].gl_Position.y, gl_in[0].gl_Position.z, 1.); //these flips in x and y are needed to match stripe 82
 
@@ -85,24 +88,30 @@ void main()
 	float s = 0.6;
 	float tp = SNduration*pow(-1.*(a1 + 1.)/(a2 + 1.), 1./(s*(a1 - a2)) );
 	float useT0 = time - tp;
-	float useTime = eventTime;
 
-	float size = SNIaLum(useTime, radiusScale, useT0, SNduration, a1, a2, s);
+	//float size = SNIaLum(eventTime, radiusScale, useT0, SNduration, a1, a2, s);
 	float sizePeak = SNIaLum(time, radiusScale, useT0, SNduration, a1, a2, s);
-	float sizeRatio = size/sizePeak;
-	
-	//limit the size at peak  based on the camera location
-	if (sizePeak > 0){
-		float dist = length(pos.xyz - uv_cameraPos.xyz);
-		float angle = atan(sizePeak, 2.*dist);
-		if (angle > SNangleMax*PI/180.){
-			sizePeak = 2.*dist*tan(SNangleMax*PI/180.);
-		}
-		if (angle < SNangleMin*PI/180.){
-			sizePeak = 2.*dist*tan(SNangleMin*PI/180.);
-		}
-		size = sizePeak*sizeRatio;
-		drawSprite(pos, size, 0);
-		
+	float dist = length(pos.xyz - uv_cameraPos.xyz);
+	float angle = atan(sizePeak, 2.*dist);
+	if (angle > SNangleMax*PI/180.){
+		sizePeak = 2.*dist*tan(SNangleMax*PI/180.);
 	}
+	if (angle < SNangleMin*PI/180.){
+		sizePeak = 2.*dist*tan(SNangleMin*PI/180.);
+	}
+
+	//trying to avoid the choppiness at small SNduration
+	//float ltdiff =  log(abs(eventTime - time)) - log(SNduration);
+	//float tdiff = exp(ltdiff);
+	float tdiff = abs(eventTime - time)/SNduration;
+	float size = mix(sizePeak, 0, tdiff); 
+
+	//limit the size at peak  based on the camera location
+	if (size > 0){
+		drawSprite(pos, size, 0);
+	}
+
+	// if (abs(time - eventTime)/2. < SNduration){
+	// 	drawSprite(pos, sizePeak, 0);
+	// }
 }
