@@ -68,13 +68,13 @@ void main()
 {
 	
 	//get the time 
-	float Uhourfract = uv_simulationtimeSeconds/(3600.);
-	float eventTime = (uv_simulationtimeDays*24. + Uhourfract);
+	float Uminfract = uv_simulationtimeSeconds/60;
+	float eventTime = (uv_simulationtimeDays*24.*60. + Uminfract);
 
-	float time = gl_in[1].gl_Position.x; //hours
+	float time = gl_in[1].gl_Position.x; //minutes
 	// allow this to repeat
-	float tmin = 0.106244;
-	float tmax = 2348.87592;
+	float tmin = 5.97734;
+	float tmax = 140932.7;
 	eventTime = mod(eventTime, tmax); 
 
 	
