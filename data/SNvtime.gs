@@ -68,13 +68,13 @@ void main()
 {
 	
 	//get the time 
-	float Uminfract = uv_simulationtimeSeconds/60;
-	float eventTime = (uv_simulationtimeDays*24.*60. + Uminfract);
+	float eventTime = uv_simulationtimeSeconds/60;
+	//float eventTime = (uv_simulationtimeDays*24.*60. + Uminfract);
 
 	float time = gl_in[1].gl_Position.x; //minutes
 	// allow this to repeat
-	float tmin = 5.97734;
-	float tmax = 140932.7;
+	float tmin = 6.11884;
+	float tmax = 14881.67;
 	eventTime = mod(eventTime, tmax); 
 
 	
@@ -100,6 +100,8 @@ void main()
 	}
 	size = sizePeak*sizeRatio;
 	sizeFrac = (sizePeak - size)/sizePeak;
+
+	size = smoothstep(0, sizePeak, clamp(1. - abs(eventTime - time)/SNduration, 0, 1));
 
 	if (size > 0){
 		drawSprite(pos, size, 0);
